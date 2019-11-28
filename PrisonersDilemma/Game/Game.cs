@@ -16,8 +16,9 @@ namespace PrisonersDilemma.Game
     public static class CalculateGameResult
     {
         [FunctionName("SingleGame")]
-        public static Plea RunSingleGame([ActivityTrigger] (List<GameResult> previousPleas, int i) inputs, ILogger log)
+        public static Plea RunSingleGame([ActivityTrigger] (List<GameResult> previousPleas, int gameIndex) inputs, ILogger log)
         {
+            log.LogWarning($"Getting plea for gameIndex {inputs.gameIndex}");
             Array values = Enum.GetValues(typeof(Plea));
             Random random = new Random();
             var ran = random.Next(values.Length);
