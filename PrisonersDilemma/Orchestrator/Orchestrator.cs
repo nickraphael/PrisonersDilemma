@@ -26,21 +26,23 @@ namespace PlayersDilemma.Orchestrator
         {
             var results = new MatchResult();
 
-            for (int gameIndex = 0; gameIndex < numberOfGames; gameIndex++)
+            // loop through the number of games 
+            for (var gameIndex = 0; gameIndex < numberOfGames; gameIndex++)
             {
                 DateTime deadline = context.CurrentUtcDateTime.Add(TimeSpan.FromSeconds(2));
                 //await context.CreateTimer(deadline, CancellationToken.None);
 
 
-                //log.LogWarning($"Game {gameIndex} in progress");
-
                 var previousPleas = results.Pleas.Take(gameIndex - 1);
-                var player1Result = await context.CallActivityAsync<Plea>("SingleGame", (previousPleas, gameIndex));
-                //log.LogWarning("Player1 chooses " + player1Result.ToString());
-                var player2Result = await context.CallActivityAsync<Plea>("SingleGame", (previousPleas, gameIndex));
-                //log.LogWarning("Player2 chooses " + player2Result.ToString());
 
-                var gameResult = new GameResult() { Player1 = player1Result, Player2 = player2Result };
+                // run the player functions in parallel
+                var playerPleaTasks = new List<Task<Plea>>();
+                playerPleaTasks.Add(context.CallActivityAsync<Plea>("SingleGame", (Player.Player1, previousPleas, gameIndex)));
+                playerPleaTasks.Add(context.CallActivityAsync<Plea>("SingleGame", (Player.Player2, previousPleas, gameIndex)));
+                await Task.WhenAll(playerPleaTasks);
+
+                // add the selected pleas to the results
+                var gameResult = new GameResult() { Player1 = playerPleaTasks[0].Result, Player2 = playerPleaTasks[1].Result };
                 results.Pleas.Add(gameResult);
             }
 
@@ -56,9 +58,8 @@ namespace PlayersDilemma.Orchestrator
             }
             context.SetCustomStatus($"Player1 {results.Player1JailTime.ToString()}-{results.Player2JailTime.ToString()} Player2");
 
-            log.LogWarning("---------------------------------------------------");
-            log.LogWarning($"Results are in! Players1 jailtime={results.Player1JailTime.ToString()}. Player2 jailtime={results.Player2JailTime.ToString()}");
-            log.LogWarning("---------------------------------------------------");
+            ShowResults(results, log);
+            
             return results;
         }
 
@@ -74,6 +75,26 @@ namespace PlayersDilemma.Orchestrator
             log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
 
             return starter.CreateCheckStatusResponse(req, instanceId);
+        }
+
+        private static void ShowResults(IMatchResult results, ILogger log)
+        {
+            log.LogWarning("---------------------------------------------------");
+            log.LogWarning($"Results are in! Players1 jailtime={results.Player1JailTime.ToString()}. Player2 jailtime={results.Player2JailTime.ToString()}");
+
+            if (results.Player1JailTime < results.Player2JailTime)
+            {
+                log.LogWarning("Player1 is the winner");
+            }
+            else if (results.Player1JailTime > results.Player2JailTime)
+            {
+                log.LogWarning("Player2 is the winner");
+            }
+            else
+            {
+                log.LogWarning("Match was a draw");
+            }
+            log.LogWarning("---------------------------------------------------");
         }
     }
 }
