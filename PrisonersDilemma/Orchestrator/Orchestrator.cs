@@ -46,20 +46,13 @@ namespace PlayersDilemma.Orchestrator
                 results.Pleas.Add(gameResult);
             }
 
-            if (results.Pleas.Count == numberOfGames)
-            {
-                for (var pleaIndex = 0; pleaIndex < results.Pleas.Count; pleaIndex++)
-                {
-                    var plea = results.Pleas[pleaIndex];
-                    var jailtimes = await context.CallActivityAsync<(int player1Jailtime, int player2Jailtime)>("CalculateGameResult", (plea.Player1, plea.Player2, pleaIndex));
-                    results.Player1JailTime += jailtimes.player1Jailtime;
-                    results.Player2JailTime += jailtimes.player2Jailtime;
-                }
-            }
-            context.SetCustomStatus($"Player1 {results.Player1JailTime.ToString()}-{results.Player2JailTime.ToString()} Player2");
+            log.LogWarning("**************************************************");
+            var aggregatedResults = await context.CallSubOrchestratorAsync<MatchResult>("CalculateMatchResultOrchestrator", results);
 
-            ShowResults(results, log);
-            
+            ShowResults(aggregatedResults, log);
+
+            context.SetCustomStatus($"Player1 {aggregatedResults.Player1JailTime.ToString()}-{aggregatedResults.Player2JailTime.ToString()} Player2");
+
             return results;
         }
 
