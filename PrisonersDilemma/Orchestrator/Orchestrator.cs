@@ -54,11 +54,10 @@ namespace PlayersDilemma.Orchestrator
 
             }
 
-            log.LogWarning("**************************************************");
             context.SetCustomStatus(JsonConvert.SerializeObject(results));
             var aggregatedResults = await context.CallSubOrchestratorAsync<MatchResult>("CalculateMatchResultOrchestrator", results);
 
-            ShowResults(aggregatedResults, log);
+            LogResults(aggregatedResults, log);
 
             context.SetCustomStatus(JsonConvert.SerializeObject(new Status
             {
@@ -84,7 +83,7 @@ namespace PlayersDilemma.Orchestrator
             return starter.CreateCheckStatusResponse(req, instanceId);
         }
 
-        private static void ShowResults(IMatchResult results, ILogger log)
+        private static void LogResults(IMatchResult results, ILogger log)
         {
             log.LogWarning("---------------------------------------------------");
             log.LogWarning($"Results are in! Players1 jailtime={results.Player1JailTime.ToString()}. Player2 jailtime={results.Player2JailTime.ToString()}");

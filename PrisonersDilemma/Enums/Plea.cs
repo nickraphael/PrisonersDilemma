@@ -6,7 +6,7 @@ namespace PrisonersDilemma.Enums
 {
     public enum Plea
     {
-        BothInnocent,
-        BlameOtherPlayer
+        Rat,
+        DontRat
     }
 }

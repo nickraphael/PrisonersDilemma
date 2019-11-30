@@ -21,15 +21,15 @@ namespace PrisonersDilemma.Orchestrator
         [FunctionName("CalculateGameResult")]
         public static (int player1Jailtime, int player2Jailtime) CalculateGameResultFunction([ActivityTrigger] (Plea player1Plea, Plea player2Plea, int index) pleas, ILogger log)
         {
-            if (pleas.player1Plea == Plea.BothInnocent && pleas.player2Plea == Plea.BothInnocent)
+            if (pleas.player1Plea == Plea.DontRat && pleas.player2Plea == Plea.DontRat)
             {
                 return (BothInnocentYears, BothInnocentYears);
             }
-            else if (pleas.player1Plea == Plea.BothInnocent && pleas.player2Plea == Plea.BlameOtherPlayer)
+            else if (pleas.player1Plea == Plea.DontRat && pleas.player2Plea == Plea.Rat)
             {
                 return (OneAccusedYears, 0);
             }
-            else if (pleas.player2Plea == Plea.BothInnocent && pleas.player1Plea == Plea.BlameOtherPlayer)
+            else if (pleas.player2Plea == Plea.DontRat && pleas.player1Plea == Plea.Rat)
             {
                 return (0, OneAccusedYears);
             }
