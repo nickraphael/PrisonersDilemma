@@ -25,6 +25,7 @@ namespace PlayersDilemma.Orchestrator
             [OrchestrationTrigger] DurableOrchestrationContext context,
             ILogger log)
         {
+            var competitionSetup = context.GetInput<CompetitionSetup>();
             var results = new MatchResult();
 
             // loop through the number of games 
@@ -33,13 +34,12 @@ namespace PlayersDilemma.Orchestrator
                 DateTime deadline = context.CurrentUtcDateTime.Add(TimeSpan.FromSeconds(2));
                 await context.CreateTimer(deadline, CancellationToken.None);
 
-
                 var previousPleas = results.Pleas.Take(gameIndex - 1);
 
                 // run the player functions in parallel
-                var playerPleaTasks = new List<Task<Plea>>();
-                playerPleaTasks.Add(context.CallActivityAsync<Plea>("SingleGame", (Player.Player1, previousPleas, gameIndex)));
-                playerPleaTasks.Add(context.CallActivityAsync<Plea>("SingleGame", (Player.Player2, previousPleas, gameIndex)));
+                var playerPleaTasks = new List<Task<PleaEnum>>();
+                playerPleaTasks.Add(context.CallActivityAsync<PleaEnum>("SingleGame", (PlayerEnum.Player1, previousPleas, gameIndex)));
+                playerPleaTasks.Add(context.CallActivityAsync<PleaEnum>("SingleGame", (PlayerEnum.Player2, previousPleas, gameIndex)));
                 await Task.WhenAll(playerPleaTasks);
 
                 // add the selected pleas to the results

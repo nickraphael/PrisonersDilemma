@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PrisonersDilemma.Enums
 {
-    public enum Plea
+    public enum PleaEnum
     {
         Rat,
         DontRat

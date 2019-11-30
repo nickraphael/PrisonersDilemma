@@ -16,13 +16,13 @@ namespace PrisonersDilemma.Game
     public static class CalculateGameResult
     {
         [FunctionName("SingleGame")]
-        public static Plea RunSingleGame([ActivityTrigger] (Player player, List<GameResult> previousPleas, int gameIndex) inputs, ILogger log)
+        public static PleaEnum RunSingleGame([ActivityTrigger] (Player player, List<GameResult> previousPleas, int gameIndex) inputs, ILogger log)
         {
             log.LogWarning($"Getting plea for player {inputs.player.ToString()}, gameIndex {inputs.gameIndex}");
-            Array values = Enum.GetValues(typeof(Plea));
+            Array values = Enum.GetValues(typeof(PleaEnum));
             Random random = new Random();
             var ran = random.Next(values.Length);
-            Plea randomPlea = (Plea)values.GetValue(random.Next(values.Length));
+            PleaEnum randomPlea = (PleaEnum)values.GetValue(random.Next(values.Length));
 
             return randomPlea;
         }

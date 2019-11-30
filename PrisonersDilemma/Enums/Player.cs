@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PrisonersDilemma.Enums
 {
-    public enum Player
+    public enum PlayerEnum
     {
         Player1,
         Player2

@@ -19,17 +19,17 @@ namespace PrisonersDilemma.Orchestrator
         const int OneAccusedYears = 3;
 
         [FunctionName("CalculateGameResult")]
-        public static (int player1Jailtime, int player2Jailtime) CalculateGameResultFunction([ActivityTrigger] (Plea player1Plea, Plea player2Plea, int index) pleas, ILogger log)
+        public static (int player1Jailtime, int player2Jailtime) CalculateGameResultFunction([ActivityTrigger] (PleaEnum player1Plea, PleaEnum player2Plea, int index) pleas, ILogger log)
         {
-            if (pleas.player1Plea == Plea.DontRat && pleas.player2Plea == Plea.DontRat)
+            if (pleas.player1Plea == PleaEnum.DontRat && pleas.player2Plea == PleaEnum.DontRat)
             {
                 return (BothInnocentYears, BothInnocentYears);
             }
-            else if (pleas.player1Plea == Plea.DontRat && pleas.player2Plea == Plea.Rat)
+            else if (pleas.player1Plea == PleaEnum.DontRat && pleas.player2Plea == PleaEnum.Rat)
             {
                 return (OneAccusedYears, 0);
             }
-            else if (pleas.player2Plea == Plea.DontRat && pleas.player1Plea == Plea.Rat)
+            else if (pleas.player2Plea == PleaEnum.DontRat && pleas.player1Plea == PleaEnum.Rat)
             {
                 return (0, OneAccusedYears);
             }
