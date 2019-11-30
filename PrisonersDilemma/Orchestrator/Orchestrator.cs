@@ -26,6 +26,7 @@ namespace PlayersDilemma.Orchestrator
             ILogger log)
         {
             var competitionSetup = context.GetInput<CompetitionSetup>();
+
             var results = new MatchResult();
 
             // loop through the number of games 
@@ -46,12 +47,12 @@ namespace PlayersDilemma.Orchestrator
                 var gameResult = new GameResult() { Player1 = playerPleaTasks[0].Result, Player2 = playerPleaTasks[1].Result };
                 results.Pleas.Add(gameResult);
 
-                context.SetCustomStatus(JsonConvert.SerializeObject(new Status() { 
+                context.SetCustomStatus(JsonConvert.SerializeObject(new Status()
+                {
                     Stage = "CollectingPleas",
-                    Message= $"Running game {gameIndex} of {numberOfGames}",
-                    Payload = results
+                    Message = $"Running game {gameIndex} of {numberOfGames} between {competitionSetup.Players[0].Name} and {competitionSetup.Players[1].Name}.",
+                    Payload = gameResult
                 }));
-
             }
 
             context.SetCustomStatus(JsonConvert.SerializeObject(results));
@@ -62,21 +63,27 @@ namespace PlayersDilemma.Orchestrator
             context.SetCustomStatus(JsonConvert.SerializeObject(new Status
             {
                 Stage = "ResultsGenerated",
-                Message = $"Player1 {aggregatedResults.Player1JailTime.ToString()}-{aggregatedResults.Player2JailTime.ToString()} Player2",
+                Message = $"{competitionSetup.Players[0].Name} {aggregatedResults.Player1JailTime.ToString()}-{aggregatedResults.Player2JailTime.ToString()} {competitionSetup.Players[1].Name}",
                 Payload = aggregatedResults
             }));
 
-            return results;
+            return aggregatedResults;
         }
 
         [FunctionName("Orchestrator_HttpStart")]
         public static async Task<HttpResponseMessage> HttpStart(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")]HttpRequestMessage req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", "post")]HttpRequestMessage req,
             [OrchestrationClient]DurableOrchestrationClient starter,
             ILogger log)
         {
+            var competitionSetup = await req.Content.ReadAsAsync<CompetitionSetup>();
+            if (competitionSetup == null)
+            {
+                throw (new ArgumentException("CompetitionSetup not supplied correctly."));
+            }
+
             // Function input comes from the request content.
-            string instanceId = await starter.StartNewAsync("Orchestrator", null);
+            string instanceId = await starter.StartNewAsync("Orchestrator", competitionSetup);
 
             log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
 
@@ -88,11 +95,11 @@ namespace PlayersDilemma.Orchestrator
             log.LogWarning("---------------------------------------------------");
             log.LogWarning($"Results are in! Players1 jailtime={results.Player1JailTime.ToString()}. Player2 jailtime={results.Player2JailTime.ToString()}");
 
-            if (results.Player1JailTime < results.Player2JailTime)
+            if (results.Winner == PlayerEnum.Player1)
             {
                 log.LogWarning("Player1 is the winner");
             }
-            else if (results.Player1JailTime > results.Player2JailTime)
+            else if (results.Winner == PlayerEnum.Player2)
             {
                 log.LogWarning("Player2 is the winner");
             }

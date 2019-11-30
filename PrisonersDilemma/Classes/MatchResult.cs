@@ -1,4 +1,6 @@
 ﻿
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using PrisonersDilemma.Enums;
 using System;
 using System.Collections.Generic;
@@ -12,6 +14,7 @@ namespace PrisonersDilemma.Classes
         List<GameResult> Pleas { get; set; }
         int Player1JailTime { get; set; }
         int Player2JailTime { get; set; }
+        PlayerEnum? Winner { get; set; }
     }
 
     public class MatchResult : IMatchResult
@@ -20,5 +23,7 @@ namespace PrisonersDilemma.Classes
         public int Player1JailTime { get; set; } = 0;
         public int Player2JailTime { get; set; } = 0;
 
+        [JsonConverter(typeof(StringEnumConverter))]
+        public PlayerEnum? Winner { get; set; }
     }
 }

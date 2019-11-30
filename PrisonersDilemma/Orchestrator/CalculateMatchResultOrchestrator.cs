@@ -45,7 +45,25 @@ namespace PrisonersDilemma.Orchestrator
             matchResult.Player1JailTime = calculateGameResultTasks.Sum(x => x.Result.player1Jailtime);
             matchResult.Player2JailTime = calculateGameResultTasks.Sum(x => x.Result.player2Jailtime);
 
+            matchResult.Winner = CalculateWinner(matchResult.Player1JailTime, matchResult.Player2JailTime);
             return matchResult;
+        }
+
+        private static PlayerEnum? CalculateWinner(int player1Jailtime, int player2Jailtime)
+        {
+
+            if (player1Jailtime < player2Jailtime)
+            {
+                return PlayerEnum.Player1;
+            }
+            else if (player1Jailtime > player2Jailtime)
+            {
+                return PlayerEnum.Player2;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         //[FunctionName("CalculateMatchResultOrchestrator_HttpStart")]

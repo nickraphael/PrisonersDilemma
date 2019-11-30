@@ -1,18 +1,23 @@
 ﻿
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using PrisonersDilemma.Enums;
 
 namespace PrisonersDilemma.Classes
 {
     public interface IGameResult
     {
-        Plea Player1 { get; set; }
-        Plea Player2 { get; set; }
+        PleaEnum Player1 { get; set; }
+        PleaEnum Player2 { get; set; }
 
     }
 
     public class GameResult : IGameResult
     {
-        public Plea Player1 { get; set; }
-        public Plea Player2 { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        public PleaEnum Player1 { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public PleaEnum Player2 { get; set; }
     }
 }

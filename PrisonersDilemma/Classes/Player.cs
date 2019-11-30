@@ -6,7 +6,7 @@ namespace PrisonersDilemma.Classes
 {
     public class Player
     {
-        string Name;
-        string ImageUri;
+        public string Name { get; set; }
+        public string ImageUri { get; set; }
     }
 }

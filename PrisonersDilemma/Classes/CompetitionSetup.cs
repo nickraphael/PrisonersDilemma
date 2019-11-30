@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace PrisonersDilemma.Classes
 {
     public class CompetitionSetup
     {
-        public int BothInnocentYears = 1;
-        public int BothAccusedYears = 2;
-        public int OneAccusedYears = 3;
+        public int BothInnocentYears { get; set; }
+        public int BothAccusedYears { get; set; }
+        public int OneAccusedYears { get; set; }
 
-        public Player[] PlayerNames;
+        public Player[] Players { get; set; }
     }
 }
