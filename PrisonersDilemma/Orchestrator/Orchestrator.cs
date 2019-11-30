@@ -9,6 +9,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using PrisonersDilemma.Classes;
 using PrisonersDilemma.Enums;
+using Newtonsoft.Json;
 
 namespace PlayersDilemma.Orchestrator
 {
@@ -30,7 +31,7 @@ namespace PlayersDilemma.Orchestrator
             for (var gameIndex = 0; gameIndex < numberOfGames; gameIndex++)
             {
                 DateTime deadline = context.CurrentUtcDateTime.Add(TimeSpan.FromSeconds(2));
-                //await context.CreateTimer(deadline, CancellationToken.None);
+                await context.CreateTimer(deadline, CancellationToken.None);
 
 
                 var previousPleas = results.Pleas.Take(gameIndex - 1);
@@ -44,14 +45,27 @@ namespace PlayersDilemma.Orchestrator
                 // add the selected pleas to the results
                 var gameResult = new GameResult() { Player1 = playerPleaTasks[0].Result, Player2 = playerPleaTasks[1].Result };
                 results.Pleas.Add(gameResult);
+
+                context.SetCustomStatus(JsonConvert.SerializeObject(new Status() { 
+                    Stage = "CollectingPleas",
+                    Message= $"Running game {gameIndex} of {numberOfGames}",
+                    Payload = results
+                }));
+
             }
 
             log.LogWarning("**************************************************");
+            context.SetCustomStatus(JsonConvert.SerializeObject(results));
             var aggregatedResults = await context.CallSubOrchestratorAsync<MatchResult>("CalculateMatchResultOrchestrator", results);
 
             ShowResults(aggregatedResults, log);
 
-            context.SetCustomStatus($"Player1 {aggregatedResults.Player1JailTime.ToString()}-{aggregatedResults.Player2JailTime.ToString()} Player2");
+            context.SetCustomStatus(JsonConvert.SerializeObject(new Status
+            {
+                Stage = "ResultsGenerated",
+                Message = $"Player1 {aggregatedResults.Player1JailTime.ToString()}-{aggregatedResults.Player2JailTime.ToString()} Player2",
+                Payload = aggregatedResults
+            }));
 
             return results;
         }
