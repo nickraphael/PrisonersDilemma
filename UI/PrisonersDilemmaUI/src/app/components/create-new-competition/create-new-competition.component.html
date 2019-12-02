@@ -1,0 +1,15 @@
+<form [formGroup]="setupForm" novalidate (submit)="submit()">
+  <textarea
+    matInput
+    [ngClass]="'qa-initiate-approval-emailText'"
+    #competitionJson
+    maxlength="1000"
+    formControlName="competitionSetup"
+    type="text"
+    cols="30"
+    rows="10"
+  ></textarea>
+  <button mat-button (click)="startCompetition()" type="submit">
+    Start
+  </button>
+</form>
