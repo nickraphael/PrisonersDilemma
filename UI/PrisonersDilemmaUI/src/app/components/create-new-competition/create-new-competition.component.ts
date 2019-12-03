@@ -1,6 +1,8 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, Output, EventEmitter } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { AzureFunctionsService } from "src/app/services/azure-functions.service";
+import { IOrchestrationInfo } from "src/app/models/orchestration-info.model";
+import { ICompetitionSetup } from "src/app/models/competition-setup.model";
 
 @Component({
   selector: "app-create-new-competition",
@@ -8,12 +10,13 @@ import { AzureFunctionsService } from "src/app/services/azure-functions.service"
   styleUrls: ["./create-new-competition.component.css"]
 })
 export class CreateNewCompetitionComponent implements OnInit {
+  @Output() competitionSetup: EventEmitter<
+    ICompetitionSetup
+  > = new EventEmitter<ICompetitionSetup>();
+
   setupForm: FormGroup;
 
-  constructor(
-    private fb: FormBuilder,
-    private azureFunctionsService: AzureFunctionsService
-  ) {}
+  constructor(private fb: FormBuilder) {}
 
   ngOnInit() {
     this.setupForm = this.fb.group({
@@ -40,9 +43,9 @@ export class CreateNewCompetitionComponent implements OnInit {
   }
 
   startCompetition() {
-    debugger;
-    this.azureFunctionsService.startCompetition(
+    const competitionSetup: ICompetitionSetup = JSON.parse(
       this.setupForm.controls.competitionSetup.value
     );
+    this.competitionSetup.emit(competitionSetup);
   }
 }

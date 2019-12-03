@@ -8,6 +8,8 @@ import { AppComponent } from "./app.component";
 import { CreateNewCompetitionComponent } from "./components/create-new-competition/create-new-competition.component";
 
 import { HttpClientModule } from "@angular/common/http";
+import { NgxJsonViewerModule } from "ngx-json-viewer";
+
 @NgModule({
   declarations: [AppComponent, CreateNewCompetitionComponent],
   imports: [
@@ -16,7 +18,8 @@ import { HttpClientModule } from "@angular/common/http";
     BrowserAnimationsModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    NgxJsonViewerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

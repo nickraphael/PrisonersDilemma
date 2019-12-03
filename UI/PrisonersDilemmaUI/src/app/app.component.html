@@ -1,3 +1,11 @@
 <h2>Start New Competition</h2>
 
-<app-create-new-competition></app-create-new-competition>
+<app-create-new-competition
+  (competitionSetup)="initialiseCompetition($event)"
+></app-create-new-competition>
+<div *ngIf="!!orchestrationInfo">
+  <ngx-json-viewer [json]="orchestrationInfo"></ngx-json-viewer>
+</div>
+<div *ngIf="!!status">
+  <ngx-json-viewer [json]="status"></ngx-json-viewer>
+</div>

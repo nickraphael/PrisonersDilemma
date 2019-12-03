@@ -1,4 +1,4 @@
-<form [formGroup]="setupForm" novalidate (submit)="submit()">
+<form [formGroup]="setupForm" novalidate (submit)="startCompetition()">
   <textarea
     matInput
     [ngClass]="'qa-initiate-approval-emailText'"
@@ -9,7 +9,7 @@
     cols="30"
     rows="10"
   ></textarea>
-  <button mat-button (click)="startCompetition()" type="submit">
+  <button mat-button type="submit">
     Start
   </button>
 </form>
