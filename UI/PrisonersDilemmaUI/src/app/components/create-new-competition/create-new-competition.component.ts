@@ -25,7 +25,9 @@ export class CreateNewCompetitionComponent implements OnInit {
       {
         "BothInnocentYears": 1,
         "BothAccusedYears": 2,
-          "OneAccusedYears": 3,
+        "OneAccusedYears": 3,
+        "MinimumNumberOfGames": 5,
+        "MaximumNumberOfGames": 15,
         "Players": [
         {
           "Name": "Nick",
@@ -33,6 +35,10 @@ export class CreateNewCompetitionComponent implements OnInit {
         },
         {
           "Name": "Dave",
+          "ImageUri": "xxxxx"
+        },
+        {
+          "Name": "Nelly",
           "ImageUri": "xxxxx"
         }]
       }

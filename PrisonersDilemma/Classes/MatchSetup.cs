@@ -2,14 +2,13 @@
 
 namespace PrisonersDilemma.Classes
 {
-    public class CompetitionSetup
+    public class MatchSetup
     {
         public int BothInnocentYears { get; set; }
         public int BothAccusedYears { get; set; }
         public int OneAccusedYears { get; set; }
 
-        public int MinimumNumberOfGames { get; set; }
-        public int MaximumNumberOfGames { get; set; }
+        public int NumberOfGames { get; set; }
 
         public Player[] Players { get; set; }
     }

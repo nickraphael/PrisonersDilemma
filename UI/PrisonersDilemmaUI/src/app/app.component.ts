@@ -13,7 +13,7 @@ import { takeUntil, take } from "rxjs/operators";
 export class AppComponent implements OnDestroy {
   title = "PrisonersDilemmaUI";
   orchestrationInfo: IOrchestrationInfo;
-  status: object;
+  status: any;
 
   private onDestroy = new Subject();
   private onOrchestrationComplete = new Subject();
@@ -44,6 +44,12 @@ export class AppComponent implements OnDestroy {
             }
           });
       });
+  }
+
+  terminate() {
+    this.azureFunctionsService
+      .terminateOrchestration(this.orchestrationInfo.terminatePostUri)
+      .subscribe();
   }
 
   ngOnDestroy() {

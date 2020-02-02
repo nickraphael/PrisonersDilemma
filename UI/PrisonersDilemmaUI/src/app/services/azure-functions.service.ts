@@ -19,4 +19,8 @@ export class AzureFunctionsService {
   public getOrchestrationStatus(uri: string) {
     return this.http.get<any>(uri);
   }
+
+  public terminateOrchestration(uri: string) {
+    return this.http.post<any>(uri, null);
+  }
 }

@@ -19,6 +19,8 @@ namespace PrisonersDilemma.Classes
 
     public class MatchResult : IMatchResult
     {
+        public Player Player1 { get; set; }
+        public Player Player2 { get; set; }
         public List<GameResult> Pleas { get; set; } = new List<GameResult>();
         public int Player1JailTime { get; set; } = 0;
         public int Player2JailTime { get; set; } = 0;

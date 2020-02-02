@@ -12,25 +12,17 @@ using PrisonersDilemma.Classes;
 using System.Net.Http;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 
 namespace PrisonersDilemma.Orchestrator
 {
     public static class CalculateMatchResultOrchestrator
     {
-
-        //[FunctionName("CalculateMatchResult")]
-        //public static (int player1Jailtime, int player2Jailtime) CalculateMatchResultFunction([ActivityTrigger] (Plea player1Plea, Plea player2Plea) pleas, ILogger log)
-        //{
-        //    //needs to be durable and fan out to call calcgameresults
-        //}
-
         [FunctionName("CalculateMatchResultOrchestrator")]
         public static async Task<MatchResult> RunCalculateMatchResultOrchestrator(
             [OrchestrationTrigger] DurableOrchestrationContext context,
             ILogger log)
         {
-            log.LogWarning("Running RunCalculateMatchResultOrchestrator");
-
             var matchResult = context.GetInput<MatchResult>();
 
             // run the player functions in parallel
@@ -66,18 +58,5 @@ namespace PrisonersDilemma.Orchestrator
             }
         }
 
-        //[FunctionName("CalculateMatchResultOrchestrator_HttpStart")]
-        //public static async Task<HttpResponseMessage> HttpStart(
-        //    [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")]HttpRequestMessage req,
-        //    [OrchestrationClient]DurableOrchestrationClient starter,
-        //    ILogger log)
-        //{
-        //    // Function input comes from the request content.
-        //    string instanceId = await starter.StartNewAsync("CalculateMatchResultOrchestrator", null);
-
-        //    log.LogInformation($"Started CalculateMatchResultOrchestrator with ID = '{instanceId}'.");
-
-        //    return starter.CreateCheckStatusResponse(req, instanceId);
-        //}
     }
 }
