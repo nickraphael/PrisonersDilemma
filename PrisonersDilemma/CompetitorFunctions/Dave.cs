@@ -12,29 +12,25 @@ using PrisonersDilemma.Classes;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace PrisonersDilemma.Game
+namespace PrisonersDilemma.CompetitorFunctions
 {
     public static class CalculateGameResult
     {
-        [FunctionName("SingleGame")]
-        public static PleaEnum RunSingleGame([ActivityTrigger] (MatchSetup matchSetup, PlayerEnum player, List<GameResult> previousPleas, int gameIndex) inputs, ILogger log)
+        [FunctionName("Dave")]
+        public static PleaEnum RunSingleGame([ActivityTrigger] (MatchSetup matchSetup, PlayerEnum player, List<GameResult> previousPleas, int gameIndex, bool showDebug) inputs, ILogger log)
         {
             var playerName = inputs.player == PlayerEnum.Player1 ? inputs.matchSetup.Players[0].Name : inputs.matchSetup.Players[1].Name;
-            Debug.WriteLine($"Getting plea for player {playerName}, gameIndex {inputs.gameIndex}, in match {inputs.matchSetup.Players[0].Name} v {inputs.matchSetup.Players[1].Name}");
             Array values = Enum.GetValues(typeof(PleaEnum));
-            
-            if(playerName == "Nick")
-            {
-                return PleaEnum.Rat;
-            }
-            if (playerName == "Nelly")
-            {
-                return PleaEnum.DontRat;
-            }
 
             Random random = new Random();
             var ran = random.Next(values.Length);
             PleaEnum randomPlea = (PleaEnum)values.GetValue(random.Next(values.Length));
+
+            if (inputs.showDebug)
+            {
+                Debug.WriteLine($"{playerName} chooses {randomPlea.ToString()} in game {inputs.gameIndex}, in match {inputs.matchSetup.Players[0].Name} v {inputs.matchSetup.Players[1].Name}");
+            }
+
             return randomPlea;
         }
     }

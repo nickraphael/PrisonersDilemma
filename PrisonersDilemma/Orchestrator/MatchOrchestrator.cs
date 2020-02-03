@@ -14,10 +14,10 @@ using System.Diagnostics;
 
 namespace PlayersDilemma.Orchestrator
 {
-    
-
     public static class MatchOrchestrator
     {
+        private static readonly bool showIndividualFunctionDebugMessages = false;
+
         [FunctionName("MatchOrchestrator")]
         public static async Task<MatchResult> RunMatchOrchestrator(
             [OrchestrationTrigger] DurableOrchestrationContext context,
@@ -35,12 +35,12 @@ namespace PlayersDilemma.Orchestrator
                 DateTime deadline = context.CurrentUtcDateTime.Add(TimeSpan.FromSeconds(2));
                 await context.CreateTimer(deadline, CancellationToken.None);
 
-                var previousPleas = results.Pleas.Take(gameIndex - 1);
+                var previousPleas = results.Pleas.Take(gameIndex);
 
                 // run the player functions in parallel
                 var playerPleaTasks = new List<Task<PleaEnum>>();
-                playerPleaTasks.Add(context.CallActivityAsync<PleaEnum>("SingleGame", (matchSetup, PlayerEnum.Player1, previousPleas, gameIndex)));
-                playerPleaTasks.Add(context.CallActivityAsync<PleaEnum>("SingleGame", (matchSetup, PlayerEnum.Player2, previousPleas, gameIndex)));
+                playerPleaTasks.Add(context.CallActivityAsync<PleaEnum>(matchSetup.Players[0].Name, (matchSetup, PlayerEnum.Player1, previousPleas, gameIndex, showIndividualFunctionDebugMessages)));
+                playerPleaTasks.Add(context.CallActivityAsync<PleaEnum>(matchSetup.Players[1].Name, (matchSetup, PlayerEnum.Player2, previousPleas, gameIndex, showIndividualFunctionDebugMessages)));
                 await Task.WhenAll(playerPleaTasks);
 
                 // add the selected pleas to the results
@@ -72,22 +72,22 @@ namespace PlayersDilemma.Orchestrator
 
         private static void LogResults(MatchSetup matchSetup, IMatchResult results, ILogger log)
         {
-            Debug.WriteLine("---------------------------------------------------");
-            Debug.WriteLine($"Results are in! {matchSetup.Players[0].Name} jailtime={results.Player1JailTime.ToString()}. {matchSetup.Players[1].Name} jailtime={results.Player2JailTime.ToString()}");
-
+            string winner;
             if (results.Winner == PlayerEnum.Player1)
             {
-                Debug.WriteLine($"{matchSetup.Players[0].Name} is the winner over {matchSetup.NumberOfGames.ToString()} games.");
+                winner = matchSetup.Players[0].Name;
             }
             else if (results.Winner == PlayerEnum.Player2)
             {
-                Debug.WriteLine($"{matchSetup.Players[1].Name} is the winner over {matchSetup.NumberOfGames.ToString()} games.");
+                winner = matchSetup.Players[1].Name;
             }
             else
             {
-                Debug.WriteLine($"Match was a draw over {matchSetup.NumberOfGames.ToString()} games.");
+                winner = "Draw";
             }
-            Debug.WriteLine("---------------------------------------------------");
+
+            Debug.WriteLine($"Match {matchSetup.Players[0].Name} v {matchSetup.Players[1].Name} complete.  {matchSetup.Players[0].Name} jailtime={results.Player1JailTime.ToString()}. {matchSetup.Players[1].Name} jailtime={results.Player2JailTime.ToString()}. {winner} won over {matchSetup.NumberOfGames} games.");
+
         }
     }
 }

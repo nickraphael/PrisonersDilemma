@@ -63,6 +63,7 @@ namespace PlayersDilemma.Orchestrator
 
         private static void showFinalResults(CompetitionSetup competitionSetup, List<Task<MatchResult>> matchResults, ILogger log)
         {
+            Debug.WriteLine("FINAL STANDINGS -----------------------");
             foreach (var player in competitionSetup.Players)
             {
                 var playerName = player.Name;
@@ -75,6 +76,7 @@ namespace PlayersDilemma.Orchestrator
 
                 Debug.WriteLine($"{playerName} = {totalJailTime}");
             }
+            Debug.WriteLine("---------------------------------------");
         }
 
         [FunctionName("CompetitionOrchestrator_HttpStart")]
