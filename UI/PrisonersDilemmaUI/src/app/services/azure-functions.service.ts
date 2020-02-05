@@ -11,7 +11,7 @@ export class AzureFunctionsService {
 
   public startCompetition(setup: ICompetitionSetup) {
     return this.http.post<IOrchestrationInfo>(
-      `http://localhost:7071/api/Orchestrator_HttpStart`,
+      `http://localhost:7071/api/CompetitionOrchestrator_HttpStart`,
       setup
     );
   }

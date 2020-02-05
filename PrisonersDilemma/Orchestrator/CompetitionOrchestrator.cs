@@ -14,7 +14,7 @@ using System.Diagnostics;
 
 namespace PlayersDilemma.Orchestrator
 {
-    
+
 
     public static class CompetitionOrchestrator
     {
@@ -35,23 +35,40 @@ namespace PlayersDilemma.Orchestrator
 
             //// loop through the matches
             var matchTasks = new List<Task<MatchResult>>();
-            foreach (var matchup in matchups)
+            for(var i = 0; i < matchups.Count(); i++)      
             {
-                
                 var matchSetup = new MatchSetup
                 {
                     BothAccusedYears = competitionSetup.BothAccusedYears,
                     BothInnocentYears = competitionSetup.BothInnocentYears,
                     NumberOfGames = numberOfGames,
-                    Players = matchup
+                    Players = matchups[i]
                 };
-        
-                matchTasks.Add(context.CallSubOrchestratorAsync<MatchResult>("MatchOrchestrator", matchSetup));
+
+                matchTasks.Add(context.CallSubOrchestratorAsync<MatchResult>("MatchOrchestrator", $"{context.InstanceId}_{i}", matchSetup));
             }
+
+            context.SetCustomStatus(JsonConvert.SerializeObject(new Status()
+            {
+                Stage = "Running Matches",
+                Message = $"Running all matches.",
+                Payload = matchups.Select((m, index) => new { instanceId = $"{context.InstanceId}_{index}"})
+            }));
+
             await Task.WhenAll(matchTasks);
 
-            showFinalResults(competitionSetup, matchTasks, log);
+            var competitionResults = new CompetitionResult
+            {
+                MatchResults = matchTasks.Select(t => t.Result).ToList(),
+                OverallResults = calculateOverallResults(competitionSetup, matchTasks, log)
+            };
 
+            context.SetCustomStatus(JsonConvert.SerializeObject(new Status()
+            {
+                Stage = "Complete",
+                Message = $"Competition Complete",
+                Payload = competitionResults
+            }));
         }
 
         private static Player[][] CalculateMatches(Player[] players)
@@ -61,8 +78,10 @@ namespace PlayersDilemma.Orchestrator
                 .ToArray();
         }
 
-        private static void showFinalResults(CompetitionSetup competitionSetup, List<Task<MatchResult>> matchResults, ILogger log)
+        private static Dictionary<string, int> calculateOverallResults(CompetitionSetup competitionSetup, List<Task<MatchResult>> matchResults, ILogger log)
         {
+            var results = new Dictionary<string, int>();
+
             Debug.WriteLine("FINAL STANDINGS -----------------------");
             foreach (var player in competitionSetup.Players)
             {
@@ -75,8 +94,10 @@ namespace PlayersDilemma.Orchestrator
                 });
 
                 Debug.WriteLine($"{playerName} = {totalJailTime}");
+                results.Add(playerName, totalJailTime);
             }
             Debug.WriteLine("---------------------------------------");
+            return results;
         }
 
         [FunctionName("CompetitionOrchestrator_HttpStart")]

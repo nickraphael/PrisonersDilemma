@@ -11,5 +11,6 @@ namespace PrisonersDilemma.Classes
         public int NumberOfGames { get; set; }
 
         public Player[] Players { get; set; }
+
     }
 }
