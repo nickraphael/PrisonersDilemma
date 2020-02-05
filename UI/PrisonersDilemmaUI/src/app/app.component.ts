@@ -14,6 +14,7 @@ export class AppComponent implements OnDestroy {
   title = "PrisonersDilemmaUI";
   orchestrationInfo: IOrchestrationInfo;
   status: any;
+  stage: string;
 
   private onDestroy = new Subject();
   private onOrchestrationComplete = new Subject();
@@ -26,11 +27,11 @@ export class AppComponent implements OnDestroy {
       .pipe(takeUntil(this.onDestroy))
       .subscribe(orchestrationInfo => {
         this.orchestrationInfo = orchestrationInfo;
-        this.startMonitoring(orchestrationInfo);
+        this.startCompetitionMonitoring(orchestrationInfo);
       });
   }
 
-  startMonitoring(orchestrationInfo: IOrchestrationInfo) {
+  startCompetitionMonitoring(orchestrationInfo: IOrchestrationInfo) {
     timer(0, 1000)
       .pipe(takeUntil(this.onOrchestrationComplete))
       .subscribe(() => {
@@ -39,8 +40,44 @@ export class AppComponent implements OnDestroy {
           .pipe(take(1))
           .subscribe(status => {
             this.status = status;
-            if (status.runtimeStatus === "Completed") {
+            if (!!status.customStatus) {
+              this.stage = JSON.parse(status.customStatus).Stage;
+            }
+
+            if (this.stage === "Running Matches") {
+              const matchIndexes: number[] = JSON.parse(status.customStatus)
+                .Payload;
+              matchIndexes.forEach(matchIndex => {
+                this.startMatchMonitoring(
+                  orchestrationInfo.statusQueryGetUri,
+                  matchIndex
+                );
+              });
+            } else if (status.runtimeStatus === "Completed") {
               this.onOrchestrationComplete.next();
+            }
+          });
+      });
+  }
+
+  startMatchMonitoring(statusQueryGetUri: string, matchIndex: number) {
+    timer(0, 1000)
+      .pipe(takeUntil(this.onOrchestrationComplete))
+      .subscribe(() => {
+        const insertIndex = statusQueryGetUri.indexOf("?taskHub");
+        const matchStatusQueryGetUri = [
+          statusQueryGetUri.slice(0, insertIndex),
+          "_" + matchIndex,
+          statusQueryGetUri.slice(insertIndex)
+        ].join("");
+
+        console.log(matchStatusQueryGetUri);
+
+        this.azureFunctionsService
+          .getOrchestrationStatus(matchStatusQueryGetUri)
+          .pipe(take(1))
+          .subscribe(status => {
+            if (status.runtimeStatus === "CollectingPleas") {
             }
           });
       });

@@ -52,7 +52,7 @@ namespace PlayersDilemma.Orchestrator
             {
                 Stage = "Running Matches",
                 Message = $"Running all matches.",
-                Payload = matchups.Select((m, index) => new { instanceId = $"{context.InstanceId}_{index}"})
+                Payload = matchups.Select((m, index) => index)
             }));
 
             await Task.WhenAll(matchTasks);

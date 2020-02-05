@@ -62,7 +62,7 @@ namespace PlayersDilemma.Orchestrator
 
             context.SetCustomStatus(JsonConvert.SerializeObject(new Status
             {
-                Stage = "ResultsGenerated",
+                Stage = "Completed",
                 Message = $"{matchSetup.Players[0].Name} {aggregatedResults.Player1JailTime.ToString()}-{aggregatedResults.Player2JailTime.ToString()} {matchSetup.Players[1].Name}",
                 Payload = aggregatedResults
             }));
