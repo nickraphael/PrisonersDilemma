@@ -19,6 +19,8 @@ export class AppComponent implements OnDestroy {
   private onDestroy = new Subject();
   private onOrchestrationComplete = new Subject();
 
+  private matchIndexes: number[] = [];
+
   constructor(private azureFunctionsService: AzureFunctionsService) {}
 
   initialiseCompetition(competitionSetup: ICompetitionSetup) {
@@ -45,9 +47,8 @@ export class AppComponent implements OnDestroy {
             }
 
             if (this.stage === "Running Matches") {
-              const matchIndexes: number[] = JSON.parse(status.customStatus)
-                .Payload;
-              matchIndexes.forEach(matchIndex => {
+              this.matchIndexes = JSON.parse(status.customStatus).Payload;
+              this.matchIndexes.forEach(matchIndex => {
                 this.startMatchMonitoring(
                   orchestrationInfo.statusQueryGetUri,
                   matchIndex
@@ -71,22 +72,55 @@ export class AppComponent implements OnDestroy {
           statusQueryGetUri.slice(insertIndex)
         ].join("");
 
-        console.log(matchStatusQueryGetUri);
-
         this.azureFunctionsService
           .getOrchestrationStatus(matchStatusQueryGetUri)
           .pipe(take(1))
           .subscribe(status => {
             if (status.runtimeStatus === "CollectingPleas") {
+              debugger;
             }
           });
       });
   }
 
   terminate() {
+    // stop monitoring
+    this.onOrchestrationComplete.next();
+
+    // terminate competitionOrchastrator
     this.azureFunctionsService
       .terminateOrchestration(this.orchestrationInfo.terminatePostUri)
-      .subscribe();
+      .subscribe(
+        x => {
+          console.log("Competition orchestrator terminated");
+        },
+        err => {
+          debugger;
+        }
+      );
+
+    // terminate all matches
+    this.matchIndexes.forEach(matchIndex => {
+      const insertIndex = this.orchestrationInfo.terminatePostUri.indexOf(
+        "/terminate"
+      );
+      const matchTerminatePostUri = [
+        this.orchestrationInfo.terminatePostUri.slice(0, insertIndex),
+        "_" + matchIndex,
+        this.orchestrationInfo.terminatePostUri.slice(insertIndex)
+      ].join("");
+
+      this.azureFunctionsService
+        .terminateOrchestration(matchTerminatePostUri)
+        .subscribe(
+          x => {
+            console.log(`match ${matchIndex} terminated.`);
+          },
+          err => {
+            debugger;
+          }
+        );
+    });
   }
 
   ngOnDestroy() {

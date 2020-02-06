@@ -21,6 +21,6 @@ export class AzureFunctionsService {
   }
 
   public terminateOrchestration(uri: string) {
-    return this.http.post<any>(uri, null);
+    return this.http.post<any>(uri.replace("{text}", "user-cancelled"), "");
   }
 }

@@ -35,7 +35,7 @@ namespace PlayersDilemma.Orchestrator
 
             //// loop through the matches
             var matchTasks = new List<Task<MatchResult>>();
-            for(var i = 0; i < matchups.Count(); i++)      
+            for (var i = 0; i < matchups.Count(); i++)
             {
                 var matchSetup = new MatchSetup
                 {
