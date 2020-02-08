@@ -2,7 +2,7 @@ import { Component, OnDestroy } from "@angular/core";
 import { ICompetitionSetup } from "./models/competition-setup.model";
 import { AzureFunctionsService } from "./services/azure-functions.service";
 import { IOrchestrationInfo } from "./models/orchestration-info.model";
-import { Subject, Observable, timer } from "rxjs";
+import { Subject, Observable, timer, Subscription } from "rxjs";
 import { takeUntil, take } from "rxjs/operators";
 
 @Component({
@@ -16,26 +16,33 @@ export class AppComponent implements OnDestroy {
   status: any;
   stage: string;
 
-  private onDestroy = new Subject();
-  private onOrchestrationComplete = new Subject();
+  private stopAllSubscriptions = new Subject();
 
   private matchIndexes: number[] = [];
+
+  competitionMonitoringSubscription: Subscription;
+  matchMonitoringSubscriptions: Subscription[] = [];
 
   constructor(private azureFunctionsService: AzureFunctionsService) {}
 
   initialiseCompetition(competitionSetup: ICompetitionSetup) {
     this.azureFunctionsService
       .startCompetition(competitionSetup)
-      .pipe(takeUntil(this.onDestroy))
+      .pipe(takeUntil(this.stopAllSubscriptions))
       .subscribe(orchestrationInfo => {
         this.orchestrationInfo = orchestrationInfo;
         this.startCompetitionMonitoring(orchestrationInfo);
       });
+
+    this.stopAllSubscriptions.subscribe(x => {
+      this.competitionMonitoringSubscription.unsubscribe();
+      this.matchMonitoringSubscriptions.forEach(s => s.unsubscribe());
+    });
   }
 
   startCompetitionMonitoring(orchestrationInfo: IOrchestrationInfo) {
-    timer(0, 1000)
-      .pipe(takeUntil(this.onOrchestrationComplete))
+    this.competitionMonitoringSubscription = timer(0, 2000)
+      .pipe(takeUntil(this.stopAllSubscriptions))
       .subscribe(() => {
         this.azureFunctionsService
           .getOrchestrationStatus(orchestrationInfo.statusQueryGetUri)
@@ -46,7 +53,10 @@ export class AppComponent implements OnDestroy {
               this.stage = JSON.parse(status.customStatus).Stage;
             }
 
-            if (this.stage === "Running Matches") {
+            if (
+              this.matchMonitoringSubscriptions.length === 0 &&
+              this.stage === "Running Matches"
+            ) {
               this.matchIndexes = JSON.parse(status.customStatus).Payload;
               this.matchIndexes.forEach(matchIndex => {
                 this.startMatchMonitoring(
@@ -55,15 +65,15 @@ export class AppComponent implements OnDestroy {
                 );
               });
             } else if (status.runtimeStatus === "Completed") {
-              this.onOrchestrationComplete.next();
+              this.stopAllSubscriptions.next();
             }
           });
       });
   }
 
   startMatchMonitoring(statusQueryGetUri: string, matchIndex: number) {
-    timer(0, 1000)
-      .pipe(takeUntil(this.onOrchestrationComplete))
+    this.matchMonitoringSubscriptions[matchIndex] = timer(0, 2000)
+      .pipe(takeUntil(this.stopAllSubscriptions))
       .subscribe(() => {
         const insertIndex = statusQueryGetUri.indexOf("?taskHub");
         const matchStatusQueryGetUri = [
@@ -76,8 +86,11 @@ export class AppComponent implements OnDestroy {
           .getOrchestrationStatus(matchStatusQueryGetUri)
           .pipe(take(1))
           .subscribe(status => {
+            console.log(`Got status for match ${matchIndex}`);
             if (status.runtimeStatus === "CollectingPleas") {
               debugger;
+            } else if (status.runtimeStatus === "Terminated") {
+              this.stopAllSubscriptions.next();
             }
           });
       });
@@ -85,7 +98,7 @@ export class AppComponent implements OnDestroy {
 
   terminate() {
     // stop monitoring
-    this.onOrchestrationComplete.next();
+    this.stopAllSubscriptions.next();
 
     // terminate competitionOrchastrator
     this.azureFunctionsService
@@ -124,7 +137,7 @@ export class AppComponent implements OnDestroy {
   }
 
   ngOnDestroy() {
-    this.onDestroy.next();
-    this.onDestroy.unsubscribe();
+    this.stopAllSubscriptions.next();
+    this.stopAllSubscriptions.unsubscribe();
   }
 }

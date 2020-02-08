@@ -26,7 +26,7 @@ export class CreateNewCompetitionComponent implements OnInit {
         "BothInnocentYears": 1,
         "BothAccusedYears": 2,
         "OneAccusedYears": 3,
-        "MinimumNumberOfGames": 5,
+        "MinimumNumberOfGames": 15,
         "MaximumNumberOfGames": 15,
         "Players": [
         {
