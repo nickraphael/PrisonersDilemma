@@ -10,13 +10,12 @@
   <button type="button" (click)="terminate()">terminate</button>
   <ngx-json-viewer [json]="competitionStatus"></ngx-json-viewer>
 </div>
-<div *ngFor="let matchStatus of matchStatuss; let i = index">
-  Match {{ i }}
-  <ngx-json-viewer [json]="matchStatus"></ngx-json-viewer>
+<mat-card *ngFor="let matchStatus of matchStatuss; let i = index">
+  Match {{ i }} : {{ matchStatus?.Player1 }} v {{ matchStatus?.Player2 }} :
+  {{ matchStatus?.stage }}
   <mat-progress-bar
     mode="determinate"
     [value]="100 * (matchStatus?.gamesComplete / matchStatus?.numberOfGames)"
     style="width: 250px;"
   ></mat-progress-bar>
-  {{ matchStatus?.numberOfGames }}-{{ matchStatus?.gamesComplete }}
-</div>
+</mat-card>

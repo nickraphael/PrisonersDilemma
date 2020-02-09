@@ -10,6 +10,7 @@ import { CreateNewCompetitionComponent } from "./components/create-new-competiti
 import { HttpClientModule } from "@angular/common/http";
 import { NgxJsonViewerModule } from "ngx-json-viewer";
 import { MatProgressBarModule } from "@angular/material/progress-bar";
+import {MatCardModule} from '@angular/material/card';
 
 @NgModule({
   declarations: [AppComponent, CreateNewCompetitionComponent],
@@ -21,7 +22,8 @@ import { MatProgressBarModule } from "@angular/material/progress-bar";
     ReactiveFormsModule,
     HttpClientModule,
     NgxJsonViewerModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatCardModule
   ],
   providers: [],
   bootstrap: [AppComponent]

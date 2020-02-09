@@ -106,11 +106,12 @@ export class AppComponent implements OnDestroy {
               !!JSON.parse(status.customStatus).Payload.Pleas
             ) {
               this.matchStatuss[matchIndex] = {
+                stage: JSON.parse(status.customStatus).Stage,
                 numberOfGames: status.input.NumberOfGames,
                 gamesComplete: JSON.parse(status.customStatus).Payload.Pleas
                   .length,
-                Player1JailTime: 5,
-                Player2JailTime: 10
+                Player1: JSON.parse(status.customStatus).Payload.Player1.Name,
+                Player2: JSON.parse(status.customStatus).Payload.Player2.Name
               };
             }
             // this.matchStatuss[matchIndex] = status;
