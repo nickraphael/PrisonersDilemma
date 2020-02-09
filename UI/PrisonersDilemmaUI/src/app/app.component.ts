@@ -13,7 +13,10 @@ import { takeUntil, take } from "rxjs/operators";
 export class AppComponent implements OnDestroy {
   title = "PrisonersDilemmaUI";
   orchestrationInfo: IOrchestrationInfo;
-  status: any;
+
+  competitionStatus: any;
+  matchStatuss: any[] = [];
+
   stage: string;
 
   private stopAllSubscriptions = new Subject();
@@ -48,7 +51,7 @@ export class AppComponent implements OnDestroy {
           .getOrchestrationStatus(orchestrationInfo.statusQueryGetUri)
           .pipe(take(1))
           .subscribe(status => {
-            this.status = status;
+            this.competitionStatus = status;
             if (!!status.customStatus) {
               this.stage = JSON.parse(status.customStatus).Stage;
             }
@@ -64,9 +67,9 @@ export class AppComponent implements OnDestroy {
                   matchIndex
                 );
               });
-            } else if (status.runtimeStatus === "Completed") {
-              this.stopAllSubscriptions.next();
-            }
+            } // } else if (status.runtimeStatus === "Completed") {
+            //   this.stopAllSubscriptions.next();
+            // }
           });
       });
   }
@@ -87,10 +90,28 @@ export class AppComponent implements OnDestroy {
           .pipe(take(1))
           .subscribe(status => {
             console.log(`Got status for match ${matchIndex}`);
-            if (status.runtimeStatus === "CollectingPleas") {
-              debugger;
-            } else if (status.runtimeStatus === "Terminated") {
-              this.stopAllSubscriptions.next();
+
+            if (
+              (JSON.parse(status.customStatus).Stage === "CollectingPleas" ||
+                JSON.parse(status.customStatus).Stage === "Completed") &&
+              !!JSON.parse(status.customStatus).Payload.Pleas
+            ) {
+              this.matchStatuss[matchIndex] = {
+                numberOfGames: status.input.NumberOfGames,
+                gamesComplete: JSON.parse(status.customStatus).Payload.Pleas
+                  .length,
+                Player1JailTime: 5,
+                Player2JailTime: 10
+              };
+            }
+            // this.matchStatuss[matchIndex] = status;
+
+            if (
+              status.runtimeStatus === "Terminated" ||
+              JSON.parse(status.customStatus).Stage === "Completed"
+            ) {
+              this.matchMonitoringSubscriptions[matchIndex].unsubscribe();
+              //this.stopAllSubscriptions.next();
             }
           });
       });

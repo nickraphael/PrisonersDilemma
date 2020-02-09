@@ -51,7 +51,7 @@ namespace PlayersDilemma.Orchestrator
                 {
                     Stage = "CollectingPleas",
                     Message = $"Running game {gameIndex} of {matchSetup.NumberOfGames} between {matchSetup.Players[0].Name} and {matchSetup.Players[1].Name}.",
-                    Payload = gameResult
+                    Payload = results
                 }));
             }
 
