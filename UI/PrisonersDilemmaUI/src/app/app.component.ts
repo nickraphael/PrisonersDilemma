@@ -70,6 +70,13 @@ export class AppComponent implements OnDestroy {
             } // } else if (status.runtimeStatus === "Completed") {
             //   this.stopAllSubscriptions.next();
             // }
+            if (
+              !!status.customStatus &&
+              JSON.parse(status.customStatus).Stage === "Completed"
+            ) {
+              this.competitionMonitoringSubscription.unsubscribe();
+              //this.stopAllSubscriptions.next();
+            }
           });
       });
   }
@@ -92,6 +99,8 @@ export class AppComponent implements OnDestroy {
             console.log(`Got status for match ${matchIndex}`);
 
             if (
+              status.hasOwnProperty("customStatus") &&
+              !!status.customStatus &&
               (JSON.parse(status.customStatus).Stage === "CollectingPleas" ||
                 JSON.parse(status.customStatus).Stage === "Completed") &&
               !!JSON.parse(status.customStatus).Payload.Pleas
@@ -108,10 +117,10 @@ export class AppComponent implements OnDestroy {
 
             if (
               status.runtimeStatus === "Terminated" ||
-              JSON.parse(status.customStatus).Stage === "Completed"
+              (!!status.customStatus &&
+                JSON.parse(status.customStatus).Stage === "Completed")
             ) {
               this.matchMonitoringSubscriptions[matchIndex].unsubscribe();
-              //this.stopAllSubscriptions.next();
             }
           });
       });
