@@ -21,43 +21,58 @@
 </table>
 
 <mat-card *ngFor="let matchStatus of matchStatuss; let i = index">
-  <div>Match: {{ matchStatus?.Player1 }} v {{ matchStatus?.Player2 }}</div>
-  <div>Status: {{ matchStatus?.stage }}</div>
-  <div>
-    Match progress:
-    <div style="display: inline-block">
-      <div style="display: inline-block">
-        <mat-progress-bar
-          mode="determinate"
-          [value]="
-            100 * (matchStatus?.gamesComplete / matchStatus?.numberOfGames)
-          "
-          style="width: 250px;"
-        ></mat-progress-bar>
-      </div>
-    </div>
-  </div>
-  <div>
-    King rat:
-    <div style="display: inline-block">
-      <div style="display: inline-block">
-        {{ matchStatus?.Player1 }}&nbsp;&nbsp;
-      </div>
-      <div style="display: inline-block">
-        <mat-progress-bar
-          color="warn"
-          mode="determinate"
-          [value]="
-            100 *
-            (matchStatus?.player1Rats /
-              (matchStatus?.player1Rats + matchStatus?.player2Rats))
-          "
-          style="width: 250px;"
-        ></mat-progress-bar>
-      </div>
-      <div style="display: inline-block">
-        &nbsp;&nbsp;{{ matchStatus?.Player2 }}
-      </div>
-    </div>
-  </div>
+  <table>
+    <tbody>
+      <tr>
+        <td>Match:</td>
+        <td>{{ matchStatus?.Player1 }} v {{ matchStatus?.Player2 }}</td>
+      </tr>
+      <tr>
+        <td>Status:</td>
+        <td>{{ matchStatus?.stage }}</td>
+      </tr>
+      <tr>
+        <td>Match progress:</td>
+        <td>
+          <div style="display: inline-block">
+            <div style="display: inline-block">
+              <mat-progress-bar
+                mode="determinate"
+                [value]="
+                  100 *
+                  (matchStatus?.gamesComplete / matchStatus?.numberOfGames)
+                "
+                style="width: 250px;"
+              ></mat-progress-bar>
+            </div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>King rat:</td>
+        <td>
+          <div style="display: inline-block">
+            <div style="display: inline-block">
+              {{ matchStatus?.Player1 }}&nbsp;&nbsp;
+            </div>
+            <div style="display: inline-block">
+              <mat-progress-bar
+                color="warn"
+                mode="determinate"
+                [value]="
+                  100 *
+                  (matchStatus?.player1Rats /
+                    (matchStatus?.player1Rats + matchStatus?.player2Rats))
+                "
+                style="width: 250px;"
+              ></mat-progress-bar>
+            </div>
+            <div style="display: inline-block">
+              &nbsp;&nbsp;{{ matchStatus?.Player2 }}
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </mat-card>
