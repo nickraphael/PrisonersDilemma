@@ -4,6 +4,7 @@ import { AzureFunctionsService } from "./services/azure-functions.service";
 import { IOrchestrationInfo } from "./models/orchestration-info.model";
 import { Subject, Observable, timer, Subscription } from "rxjs";
 import { takeUntil, take } from "rxjs/operators";
+import { debug } from "util";
 
 @Component({
   selector: "app-root",
@@ -111,7 +112,13 @@ export class AppComponent implements OnDestroy {
                 gamesComplete: JSON.parse(status.customStatus).Payload.Pleas
                   .length,
                 Player1: JSON.parse(status.customStatus).Payload.Player1.Name,
-                Player2: JSON.parse(status.customStatus).Payload.Player2.Name
+                Player2: JSON.parse(status.customStatus).Payload.Player2.Name,
+                player1Rats: JSON.parse(
+                  status.customStatus
+                ).Payload.Pleas.filter(p => p.Player1 === "Rat").length,
+                player2Rats: JSON.parse(
+                  status.customStatus
+                ).Payload.Pleas.filter(p => p.Player2 === "Rat").length
               };
             }
             // this.matchStatuss[matchIndex] = status;
