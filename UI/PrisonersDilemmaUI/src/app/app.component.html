@@ -8,71 +8,94 @@
 </div>
 <div *ngIf="!!competitionStatus">
   <button type="button" (click)="terminate()">terminate</button>
+
+  <mat-card *ngFor="let matchStatus of matchStatuss; let i = index">
+    <table>
+      <col width="150">
+      <col width="300">
+      <col width="150">
+      <col width="300">
+      <tbody>
+        <tr>
+          <td><b>Match:</b></td>
+          <td>{{ matchStatus?.Player1 }} v {{ matchStatus?.Player2 }}</td>
+          <td><b>Status:</b></td>
+          <td>{{ matchStatus?.stage }}</td>
+        </tr>
+        <tr>
+          <td><b>Match progress:</b></td>
+          <td>
+            <div style="display: inline-block">
+              <div style="display: inline-block">
+                <mat-progress-bar
+                  mode="determinate"
+                  [value]="
+                    100 *
+                    (matchStatus?.gamesComplete / matchStatus?.numberOfGames)
+                  "
+                  style="width: 250px;"
+                ></mat-progress-bar>
+              </div>
+            </div>
+          </td>
+          <td><b>King rat:</b></td>
+          <td>
+            <div style="display: inline-block">
+              <div style="display: inline-block">
+                {{ matchStatus?.Player1 }}&nbsp;&nbsp;
+              </div>
+              <div style="display: inline-block">
+                <igx-radial-gauge
+                  height="150px"
+                  width="150px"
+                  [value]="
+                    100 *
+                    (matchStatus?.player1Rats /
+                      (matchStatus?.player1Rats + matchStatus?.player2Rats))
+                  "
+                  interval="25"
+                  minimumValue="0"
+                  maximumValue="100"
+                  labelInterval="100"
+                  labelExtent="1000"
+                  scaleStartAngle="120"
+                  scaleEndAngle="60"
+                  backingOutline="white"
+                  backingBrush="white"
+                  scaleBrush="transparent"
+                  backingShape="Fitted"
+                  backingBrush="#fcfcfc"
+                  backingOutline="Black"
+                  backingOversweep="5"
+                  backingCornerRadius="10"
+                  backingStrokeThickness="2"
+                  backingOuterExtent="0.8"
+                  backingInnerExtent="0.15"
+                >
+                  <igx-radial-gauge-range
+                    startValue="0"
+                    endValue="50"
+                    brush="red"
+                  >
+                  </igx-radial-gauge-range>
+                  <igx-radial-gauge-range
+                    startValue="50"
+                    endValue="100"
+                    brush="yellow"
+                  >
+                  </igx-radial-gauge-range>
+                </igx-radial-gauge>
+              </div>
+              <div style="display: inline-block">
+                &nbsp;&nbsp;{{ matchStatus?.Player2 }}
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <hr />
+  </mat-card>
+
   <ngx-json-viewer [json]="competitionStatus"></ngx-json-viewer>
 </div>
-
-<table>
-  <tbody>
-    <tr>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-    </tr>
-  </tbody>
-</table>
-
-<mat-card *ngFor="let matchStatus of matchStatuss; let i = index">
-  <table>
-    <tbody>
-      <tr>
-        <td>Match:</td>
-        <td>{{ matchStatus?.Player1 }} v {{ matchStatus?.Player2 }}</td>
-      </tr>
-      <tr>
-        <td>Status:</td>
-        <td>{{ matchStatus?.stage }}</td>
-      </tr>
-      <tr>
-        <td>Match progress:</td>
-        <td>
-          <div style="display: inline-block">
-            <div style="display: inline-block">
-              <mat-progress-bar
-                mode="determinate"
-                [value]="
-                  100 *
-                  (matchStatus?.gamesComplete / matchStatus?.numberOfGames)
-                "
-                style="width: 250px;"
-              ></mat-progress-bar>
-            </div>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td>King rat:</td>
-        <td>
-          <div style="display: inline-block">
-            <div style="display: inline-block">
-              {{ matchStatus?.Player1 }}&nbsp;&nbsp;
-            </div>
-            <div style="display: inline-block">
-              <mat-progress-bar
-                color="warn"
-                mode="determinate"
-                [value]="
-                  100 *
-                  (matchStatus?.player1Rats /
-                    (matchStatus?.player1Rats + matchStatus?.player2Rats))
-                "
-                style="width: 250px;"
-              ></mat-progress-bar>
-            </div>
-            <div style="display: inline-block">
-              &nbsp;&nbsp;{{ matchStatus?.Player2 }}
-            </div>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</mat-card>

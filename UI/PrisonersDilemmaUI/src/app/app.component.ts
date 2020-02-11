@@ -1,10 +1,17 @@
-import { Component, OnDestroy } from "@angular/core";
+import { Component, OnDestroy, ViewChild } from "@angular/core";
 import { ICompetitionSetup } from "./models/competition-setup.model";
 import { AzureFunctionsService } from "./services/azure-functions.service";
 import { IOrchestrationInfo } from "./models/orchestration-info.model";
 import { Subject, Observable, timer, Subscription } from "rxjs";
 import { takeUntil, take } from "rxjs/operators";
 import { debug } from "util";
+import {
+  IgxRadialGaugeComponent,
+  IgxRadialGaugeRangeComponent,
+  RadialGaugePivotShape,
+  RadialGaugeNeedleShape
+} from "igniteui-angular-gauges";
+import { SweepDirection } from "igniteui-angular-core";
 
 @Component({
   selector: "app-root",
@@ -26,6 +33,9 @@ export class AppComponent implements OnDestroy {
 
   competitionMonitoringSubscription: Subscription;
   matchMonitoringSubscriptions: Subscription[] = [];
+
+  @ViewChild("radialGauge", { static: true })
+  public radialGauge: IgxRadialGaugeComponent;
 
   constructor(private azureFunctionsService: AzureFunctionsService) {}
 
@@ -172,6 +182,65 @@ export class AppComponent implements OnDestroy {
           }
         );
     });
+  }
+
+  public AnimateToGauge1(): void {
+    this.radialGauge.height = "330px";
+    this.radialGauge.width = "100%";
+
+    this.radialGauge.minimumValue = 0;
+    this.radialGauge.maximumValue = 10;
+    this.radialGauge.value = 7.5;
+
+    // Scale Settings
+    this.radialGauge.scaleStartAngle = 200;
+    this.radialGauge.scaleEndAngle = -20;
+    this.radialGauge.scaleBrush = "transparent";
+    this.radialGauge.scaleSweepDirection = SweepDirection.Clockwise;
+
+    // Backing Settings
+    this.radialGauge.backingOutline = "white";
+    this.radialGauge.backingBrush = "white";
+
+    // Needle Settings
+    this.radialGauge.needleEndExtent = 0.8;
+    this.radialGauge.needleShape = RadialGaugeNeedleShape.Triangle;
+    this.radialGauge.needlePivotShape = RadialGaugePivotShape.Circle;
+    this.radialGauge.needlePivotWidthRatio = 0.1;
+    this.radialGauge.needleBrush = "#79797a";
+    this.radialGauge.needleOutline = "#79797a";
+
+    // TickMark Settings
+    this.radialGauge.tickBrush = "transparent";
+    this.radialGauge.minorTickBrush = "transparent";
+
+    // Label Settings
+    this.radialGauge.labelInterval = 10;
+    this.radialGauge.labelExtent = 1;
+    this.radialGauge.font = "15px Verdana,Arial";
+
+    // setting custom gauge ranges
+    const range1 = new IgxRadialGaugeRangeComponent();
+    range1.startValue = 0;
+    range1.endValue = 5;
+    const range2 = new IgxRadialGaugeRangeComponent();
+    range2.startValue = 5;
+    range2.endValue = 10;
+
+    this.radialGauge.rangeBrushes = ["#a4bd29", "#F86232"];
+    this.radialGauge.rangeOutlines = ["#a4bd29", "#F86232"];
+    this.radialGauge.ranges.clear();
+    this.radialGauge.ranges.add(range1);
+    this.radialGauge.ranges.add(range2);
+
+    // setting extent of all gauge ranges
+    for (let i = 0; i < this.radialGauge.ranges.count; i++) {
+      const range = this.radialGauge.ranges.item(i);
+      range.innerStartExtent = 0.3;
+      range.innerEndExtent = 0.3;
+      range.outerStartExtent = 0.9;
+      range.outerEndExtent = 0.9;
+    }
   }
 
   ngOnDestroy() {

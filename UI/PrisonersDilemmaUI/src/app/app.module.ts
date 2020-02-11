@@ -10,7 +10,9 @@ import { CreateNewCompetitionComponent } from "./components/create-new-competiti
 import { HttpClientModule } from "@angular/common/http";
 import { NgxJsonViewerModule } from "ngx-json-viewer";
 import { MatProgressBarModule } from "@angular/material/progress-bar";
-import {MatCardModule} from '@angular/material/card';
+import { MatCardModule } from "@angular/material/card";
+import { IgxRadialGaugeModule } from "igniteui-angular-gauges";
+import { IgxRadialGaugeComponent } from "igniteui-angular-gauges";
 
 @NgModule({
   declarations: [AppComponent, CreateNewCompetitionComponent],
@@ -23,7 +25,8 @@ import {MatCardModule} from '@angular/material/card';
     HttpClientModule,
     NgxJsonViewerModule,
     MatProgressBarModule,
-    MatCardModule
+    MatCardModule,
+    IgxRadialGaugeModule
   ],
   providers: [],
   bootstrap: [AppComponent]
